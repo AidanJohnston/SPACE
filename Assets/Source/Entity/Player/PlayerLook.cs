@@ -32,7 +32,7 @@ namespace Entity.Player
             yRotation += mouseInput.x;
             xRotation -= mouseInput.y;
             xRotation = Mathf.Clamp(xRotation, -yClamp, yClamp); ;
-
+            
             head.transform.localRotation = Quaternion.Lerp(head.transform.localRotation,
                 Quaternion.Euler(xRotation, yRotation, 0f), Time.deltaTime * damp);
         }
