@@ -8,14 +8,12 @@ namespace Entity.Player
         [Header("Sensitivity")]
         [SerializeField] private float sensitivityX = 8f;
         [SerializeField] private float sensitivityY = 8f;
-        [SerializeField] private float multiplier = 0.01f;
-        [SerializeField] private float yClamp = 85f;
-        [SerializeField] private float damp = 15f;
+        [SerializeField] private float xClamp = 89f;
         
         [Header("Components")]
         [SerializeField] public Transform head;
+        [SerializeField] public Transform camera;
 
-        private float yRotation = 0f;
         private float xRotation = 0f;
         private Vector2 mouseInput;
         private Vector3 velocity = Vector3.zero;
@@ -25,22 +23,24 @@ namespace Entity.Player
         {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
+            xRotation = head.transform.localRotation.x;
+
         }
 
         private void LateUpdate()
         {
-            yRotation += mouseInput.x;
-            xRotation -= mouseInput.y;
-            xRotation = Mathf.Clamp(xRotation, -yClamp, yClamp); ;
+            float yRotation = mouseInput.x * sensitivityX * Time.deltaTime;
+            xRotation -= mouseInput.y * sensitivityY  * Time.deltaTime;
+            xRotation = Mathf.Clamp(xRotation, -xClamp, xClamp);
             
-            head.transform.localRotation = Quaternion.Lerp(head.transform.localRotation,
-                Quaternion.Euler(xRotation, yRotation, 0f), Time.deltaTime * damp);
+            head.transform.rotation *= Quaternion.Euler(yRotation * Vector3.up);
+            camera.transform.localRotation = Quaternion.Euler(xRotation * Vector3.right);
         }
 
         public void ReceiveMouseInput(Vector2 mouseInput)
         {
-            this.mouseInput.x = mouseInput.x * sensitivityX * multiplier * Time.deltaTime;
-            this.mouseInput.y = mouseInput.y * sensitivityY * multiplier * Time.deltaTime;
+            this.mouseInput.x = mouseInput.x; 
+            this.mouseInput.y = mouseInput.y;
         }
     }
 }
