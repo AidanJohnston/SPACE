@@ -20,6 +20,8 @@ namespace Entity.Player
             playerControls.Gameplay.Movement.performed += context => horizontalInput = context.ReadValue<Vector2>();
             playerControls.Gameplay.Jump.performed += _ => _playerMovement.OnJumpPressed();
             playerControls.Gameplay.Sprint.performed += _ => _playerMovement.OnSprintPressed();
+            playerControls.Gameplay.Crouch.started += _ => _playerMovement.OnCrouchPressed();
+            playerControls.Gameplay.Crouch.canceled += _ => _playerMovement.OnCrouchReleased();
             
             playerControls.Gameplay.LookX.performed += context => mouseInput.x = context.ReadValue<float>();
             playerControls.Gameplay.LookY.performed += context => mouseInput.y = context.ReadValue<float>();
