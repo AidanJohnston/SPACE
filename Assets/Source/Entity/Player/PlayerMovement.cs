@@ -10,8 +10,9 @@ namespace Entity.Player
         [SerializeField] public Transform groundCheck;
 
         [Header("Speed")]
-        [SerializeField] public float walkSpeed = 7f;
-        [SerializeField] public float runSpeed = 10f;
+        [SerializeField] public float walkSpeed = 6f;
+        [SerializeField] public float runSpeed = 9f;
+        [SerializeField] public float crouchSpeed = 3f;
         [SerializeField] public float acceleration = 10f;
         [SerializeField] public float airSpeed = 15f;
         [SerializeField] public float speed = 7f;
@@ -40,6 +41,7 @@ namespace Entity.Player
         public Vector2 horizontalInput;
         private Rigidbody rb;
         public bool isGrounded;
+        private bool isCrouch = false;
 
         private Vector3 targetVelocity;
 
@@ -57,7 +59,12 @@ namespace Entity.Player
             {
                 jumps = maxJumps;
                 
-                if (sprint)
+                if (isCrouch)
+                {
+                    speed = Mathf.Lerp(speed, crouchSpeed, acceleration * Time.deltaTime);               
+                }
+
+                else if (sprint)
                 {
                     speed = Mathf.Lerp(speed, runSpeed, acceleration * Time.deltaTime);
                 }
@@ -88,6 +95,7 @@ namespace Entity.Player
             Drag();
             Move();
             CameraFOV();
+            MoveCrouchHead();
         }
         
         // Cool idea; unfortunately a shit one
@@ -111,6 +119,35 @@ namespace Entity.Player
             rb.AddForce(velocityChange, ForceMode.VelocityChange);
         }
 
+        private void MoveCrouchHead()
+        {
+            // Go Down
+            if (isCrouch)
+            {
+                playerLook.head.transform.localPosition = Vector3.Lerp(
+                    playerLook.head.transform.localPosition,
+                    Vector3.up * 0.5f, 
+                    10f * Time.deltaTime
+                );
+            }
+            // Go up
+            else
+            {
+                if (Vector3.Dot(playerLook.head.transform.localPosition, Vector3.up) > 0.99)
+                {
+                    playerLook.head.transform.localPosition = Vector3.up;
+                }
+                else
+                {
+                    playerLook.head.transform.localPosition = Vector3.Lerp(
+                        playerLook.head.transform.localPosition,
+                        Vector3.up, 
+                        10f * Time.deltaTime
+                    );    
+                }
+            }
+        }
+
         public void HorizontalInput(Vector2 horizontalInput)
         {
             this.horizontalInput = horizontalInput;
@@ -130,6 +167,16 @@ namespace Entity.Player
         public void OnSprintPressed()
         {
             sprint = true;
+        }
+
+        public void OnCrouchPressed()
+        {
+            this.isCrouch = true;
+        }
+
+        public void OnCrouchReleased()
+        {
+            this.isCrouch = false;
         }
         
         private void Drag()
